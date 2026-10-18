@@ -1,0 +1,8 @@
+2026-10-18 16:34:07,230 | INFO | Loaded 5007 documents from clean_corpus.jsonl
+2026-10-18 16:34:12,517 | INFO | Loaded all-MiniLM-L6-v2 on cpu in 5.29s (max tokens: 256)
+2026-10-18 16:34:16,400 | INFO | 4037 of 5007 texts (80.6%) exceed 256 tokens and will be truncated
+2026-10-18 16:37:38,650 | INFO | Embedding done: {'n_texts': 5007, 'batch_size': 64, 'seconds': 202.05, 'texts_per_sec': 24.8, 'ms_per_text': 40.35, 'dim': 384}
+2026-10-18 16:37:38,697 | INFO | Saved (5007, 384) to embeddings.npy and IDs to embedding_ids.json
+2026-10-18 16:42:03,764 | INFO | Loaded all-MiniLM-L6-v2 on cpu in 4.85s (max tokens: 256)
+2026-10-18 16:45:03,037 | INFO | Loaded all-MiniLM-L6-v2 on cpu in 4.60s (max tokens: 256)
+2026-10-18 16:54:20,422 | INFO | Loaded all-MiniLM-L6-v2 on cpu in 4.85s (max tokens: 256)

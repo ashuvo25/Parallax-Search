@@ -1,0 +1,25 @@
+2026-10-18 16:54:15,569 | INFO | Collection has 5007 records
+2026-10-18 16:54:20,582 | INFO | --- Latency by query (k=5, 5 runs each) ---
+2026-10-18 16:54:20,647 | INFO | [short      ]   11.06 ms (encode   8.19 + db   2.13) | 'transformers' -> [0.4656] SO(3)-RoPE for Spherical Transformers
+2026-10-18 16:54:20,722 | INFO | [short      ]   13.83 ms (encode  10.98 + db   2.47) | 'reinforcement learning' -> [0.5638] When Do Intrinsic Rewards Lead to Exploration
+2026-10-18 16:54:20,794 | INFO | [short      ]   13.02 ms (encode  10.99 + db   1.93) | 'diffusion models' -> [0.5313] Jumping up and down Denoiser diffusion models for 
+2026-10-18 16:54:20,877 | INFO | [medium     ]   15.57 ms (encode  12.91 + db   1.93) | 'making large language models safer' -> [0.6363] The Model Plants the Trigger Answer-Side Backdoor 
+2026-10-18 16:54:20,952 | INFO | [medium     ]   13.09 ms (encode  11.13 + db   1.95) | 'graph neural networks for molecules' -> [0.5793] Latent Flow Matching for Molecular Graph Generatio
+2026-10-18 16:54:21,034 | INFO | [medium     ]   14.86 ms (encode  12.76 + db   2.13) | 'speech recognition for low-resource languages' -> [0.641] Automatic Speech Recognition for Low-Resource Sinh
+2026-10-18 16:54:21,123 | INFO | [long       ]   16.56 ms (encode  13.62 + db   2.71) | 'how can retrieval augmented generation reduce' -> [0.6121] PHRBench A Behavioral Evaluation of Post-Hallucina
+2026-10-18 16:54:21,213 | INFO | [long       ]   16.42 ms (encode  14.32 + db   2.35) | 'methods for evaluating the robustness of visi' -> [0.6081] Adaptive Model Inversion Attacks Generalize a Priv
+2026-10-18 16:54:21,302 | INFO | [long       ]   16.71 ms (encode  13.37 + db   2.72) | 'using reinforcement learning from human feedb' -> [0.5134] SPEAR Five Principles for Interactive Human-Agent 
+2026-10-18 16:54:21,388 | INFO | [non_english]   15.46 ms (encode  13.57 + db   1.88) | 'réseaux de neurones pour la traduction automa' -> [0.4401] ReGraph A Computational Account of Emergent Genera
+2026-10-18 16:54:21,452 | INFO | [edge       ]   11.17 ms (encode   8.66 + db   2.54) | 'a' -> [0.1733] ABDA-NL A Natural-Language Scenario Explorer for A
+2026-10-18 16:54:21,527 | INFO | [edge       ]   13.41 ms (encode  11.10 + db   2.19) | '????' -> [0.1857] Keep It CALM Analyzing the Limits of Global Unsafe
+2026-10-18 16:54:21,610 | INFO | [edge       ]   15.51 ms (encode  12.78 + db   2.43) | 'the of and to in' -> [0.2099] Retrieval-Based In-Context Learning A Domain Adapt
+2026-10-18 16:54:21,610 | INFO | Overall latency: p50 14.61 ms | p95 18.21 ms | max 20.32 ms
+2026-10-18 16:54:21,611 | INFO | --- Latency vs k (query: 'making large language models safer') ---
+2026-10-18 16:54:21,709 | INFO | k=1    p50   18.71 ms | p95   20.66 ms
+2026-10-18 16:54:21,808 | INFO | k=5    p50   14.98 ms | p95   24.94 ms
+2026-10-18 16:54:21,894 | INFO | k=10   p50   15.39 ms | p95   20.92 ms
+2026-10-18 16:54:21,992 | INFO | k=50   p50   15.72 ms | p95   27.81 ms
+2026-10-18 16:54:22,090 | INFO | k=100  p50   15.59 ms | p95   27.72 ms
+2026-10-18 16:54:25,611 | INFO | --- Quality (title -> paper, 200 samples) ---
+2026-10-18 16:54:25,611 | INFO | Recall@1 0.985 | Recall@5 1.000 | MRR 0.990
+2026-10-18 16:54:25,619 | INFO | Report saved to D:\Internship-project-Parallax-Labs\logs\retrieval_report.json

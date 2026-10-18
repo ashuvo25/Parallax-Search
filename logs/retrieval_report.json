@@ -1,0 +1,260 @@
+{
+  "timestamp": "2026-10-18T16:54:25",
+  "model": "all-MiniLM-L6-v2",
+  "device": "cpu",
+  "collection_size": 5007,
+  "k": 5,
+  "repeats": 5,
+  "overall_latency": {
+    "mean_ms": 14.66,
+    "p50_ms": 14.61,
+    "p95_ms": 18.21,
+    "min_ms": 9.31,
+    "max_ms": 20.32
+  },
+  "latency_by_query": [
+    {
+      "category": "short",
+      "query": "transformers",
+      "encode_p50_ms": 8.19,
+      "db_p50_ms": 2.13,
+      "total": {
+        "mean_ms": 11.4,
+        "p50_ms": 11.06,
+        "p95_ms": 14.03,
+        "min_ms": 9.31,
+        "max_ms": 14.61
+      },
+      "top_title": "SO(3)-RoPE for Spherical Transformers",
+      "top_score": 0.4656
+    },
+    {
+      "category": "short",
+      "query": "reinforcement learning",
+      "encode_p50_ms": 10.98,
+      "db_p50_ms": 2.47,
+      "total": {
+        "mean_ms": 14.03,
+        "p50_ms": 13.83,
+        "p95_ms": 15.65,
+        "min_ms": 12.86,
+        "max_ms": 16.06
+      },
+      "top_title": "When Do Intrinsic Rewards Lead to Exploration",
+      "top_score": 0.5638
+    },
+    {
+      "category": "short",
+      "query": "diffusion models",
+      "encode_p50_ms": 10.99,
+      "db_p50_ms": 1.93,
+      "total": {
+        "mean_ms": 13.15,
+        "p50_ms": 13.02,
+        "p95_ms": 13.95,
+        "min_ms": 12.48,
+        "max_ms": 14.15
+      },
+      "top_title": "Jumping up and down Denoiser diffusion models for discrete ordinal data",
+      "top_score": 0.5313
+    },
+    {
+      "category": "medium",
+      "query": "making large language models safer",
+      "encode_p50_ms": 12.91,
+      "db_p50_ms": 1.93,
+      "total": {
+        "mean_ms": 15.61,
+        "p50_ms": 15.57,
+        "p95_ms": 17.8,
+        "min_ms": 12.94,
+        "max_ms": 17.81
+      },
+      "top_title": "The Model Plants the Trigger Answer-Side Backdoor Attacks in Multi-Turn Large Language Models",
+      "top_score": 0.6363
+    },
+    {
+      "category": "medium",
+      "query": "graph neural networks for molecules",
+      "encode_p50_ms": 11.13,
+      "db_p50_ms": 1.95,
+      "total": {
+        "mean_ms": 13.97,
+        "p50_ms": 13.09,
+        "p95_ms": 16.82,
+        "min_ms": 12.5,
+        "max_ms": 17.47
+      },
+      "top_title": "Latent Flow Matching for Molecular Graph Generation",
+      "top_score": 0.5793
+    },
+    {
+      "category": "medium",
+      "query": "speech recognition for low-resource languages",
+      "encode_p50_ms": 12.76,
+      "db_p50_ms": 2.13,
+      "total": {
+        "mean_ms": 15.26,
+        "p50_ms": 14.86,
+        "p95_ms": 17.85,
+        "min_ms": 13.48,
+        "max_ms": 18.25
+      },
+      "top_title": "Automatic Speech Recognition for Low-Resource Sinhala A Critical Review of Methods, Challenges, and Future Directions",
+      "top_score": 0.641
+    },
+    {
+      "category": "long",
+      "query": "how can retrieval augmented generation reduce hallucinations in question answering systems",
+      "encode_p50_ms": 13.62,
+      "db_p50_ms": 2.71,
+      "total": {
+        "mean_ms": 16.79,
+        "p50_ms": 16.56,
+        "p95_ms": 18.27,
+        "min_ms": 15.09,
+        "max_ms": 18.39
+      },
+      "top_title": "PHRBench A Behavioral Evaluation of Post-Hallucination Reasoning in LLMs",
+      "top_score": 0.6121
+    },
+    {
+      "category": "long",
+      "query": "methods for evaluating the robustness of vision models against adversarial attacks",
+      "encode_p50_ms": 14.32,
+      "db_p50_ms": 2.35,
+      "total": {
+        "mean_ms": 16.77,
+        "p50_ms": 16.42,
+        "p95_ms": 19.34,
+        "min_ms": 14.97,
+        "max_ms": 20.02
+      },
+      "top_title": "Adaptive Model Inversion Attacks Generalize a Privacy-Robustness Tradeoff",
+      "top_score": 0.6081
+    },
+    {
+      "category": "long",
+      "query": "using reinforcement learning from human feedback to align chatbots with user preferences",
+      "encode_p50_ms": 13.37,
+      "db_p50_ms": 2.72,
+      "total": {
+        "mean_ms": 16.63,
+        "p50_ms": 16.71,
+        "p95_ms": 17.86,
+        "min_ms": 15.18,
+        "max_ms": 18.05
+      },
+      "top_title": "SPEAR Five Principles for Interactive Human-Agent Alignment",
+      "top_score": 0.5134
+    },
+    {
+      "category": "non_english",
+      "query": "réseaux de neurones pour la traduction automatique",
+      "encode_p50_ms": 13.57,
+      "db_p50_ms": 1.88,
+      "total": {
+        "mean_ms": 16.05,
+        "p50_ms": 15.46,
+        "p95_ms": 19.38,
+        "min_ms": 13.38,
+        "max_ms": 20.32
+      },
+      "top_title": "ReGraph A Computational Account of Emergent Generalization in the what and where Dual Visual Streams",
+      "top_score": 0.4401
+    },
+    {
+      "category": "edge",
+      "query": "a",
+      "encode_p50_ms": 8.66,
+      "db_p50_ms": 2.54,
+      "total": {
+        "mean_ms": 11.7,
+        "p50_ms": 11.17,
+        "p95_ms": 13.42,
+        "min_ms": 10.81,
+        "max_ms": 13.81
+      },
+      "top_title": "ABDA-NL A Natural-Language Scenario Explorer for Argument-Based Reasoning",
+      "top_score": 0.1733
+    },
+    {
+      "category": "edge",
+      "query": "????",
+      "encode_p50_ms": 11.1,
+      "db_p50_ms": 2.19,
+      "total": {
+        "mean_ms": 13.81,
+        "p50_ms": 13.41,
+        "p95_ms": 14.92,
+        "min_ms": 12.89,
+        "max_ms": 15.01
+      },
+      "top_title": "Keep It CALM Analyzing the Limits of Global Unsafety in Text-to-Image Generation",
+      "top_score": 0.1857
+    },
+    {
+      "category": "edge",
+      "query": "the of and to in",
+      "encode_p50_ms": 12.78,
+      "db_p50_ms": 2.43,
+      "total": {
+        "mean_ms": 15.44,
+        "p50_ms": 15.51,
+        "p95_ms": 16.76,
+        "min_ms": 13.43,
+        "max_ms": 16.93
+      },
+      "top_title": "Retrieval-Based In-Context Learning A Domain Adaptation Framework",
+      "top_score": 0.2099
+    }
+  ],
+  "latency_by_k": [
+    {
+      "k": 1,
+      "mean_ms": 18.47,
+      "p50_ms": 18.71,
+      "p95_ms": 20.66,
+      "min_ms": 15.28,
+      "max_ms": 21.12
+    },
+    {
+      "k": 5,
+      "mean_ms": 18.51,
+      "p50_ms": 14.98,
+      "p95_ms": 24.94,
+      "min_ms": 14.66,
+      "max_ms": 25.54
+    },
+    {
+      "k": 10,
+      "mean_ms": 15.95,
+      "p50_ms": 15.39,
+      "p95_ms": 20.92,
+      "min_ms": 12.34,
+      "max_ms": 21.78
+    },
+    {
+      "k": 50,
+      "mean_ms": 18.49,
+      "p50_ms": 15.72,
+      "p95_ms": 27.81,
+      "min_ms": 14.11,
+      "max_ms": 30.66
+    },
+    {
+      "k": 100,
+      "mean_ms": 18.33,
+      "p50_ms": 15.59,
+      "p95_ms": 27.72,
+      "min_ms": 14.48,
+      "max_ms": 30.65
+    }
+  ],
+  "quality": {
+    "n_queries": 200,
+    "recall@1": 0.985,
+    "recall@5": 1.0,
+    "mrr": 0.9897
+  }
+}
