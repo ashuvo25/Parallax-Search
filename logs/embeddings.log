@@ -6,3 +6,5 @@
 2026-10-18 16:42:03,764 | INFO | Loaded all-MiniLM-L6-v2 on cpu in 4.85s (max tokens: 256)
 2026-10-18 16:45:03,037 | INFO | Loaded all-MiniLM-L6-v2 on cpu in 4.60s (max tokens: 256)
 2026-10-18 16:54:20,422 | INFO | Loaded all-MiniLM-L6-v2 on cpu in 4.85s (max tokens: 256)
+2026-10-25 22:22:22,502 | INFO | Loaded all-MiniLM-L6-v2 on cpu in 5.80s (max tokens: 256)
+2026-10-25 22:22:52,306 | INFO | Loaded all-MiniLM-L6-v2 on cpu in 5.12s (max tokens: 256)
