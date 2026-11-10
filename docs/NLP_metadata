@@ -1,0 +1,315 @@
+# NLP Metadata: Topics and Named Entities
+
+Parallax-Search, Week 4
+
+This document describes the topic and entity metadata added to the corpus, how it was produced, how it is used for filtered retrieval, and how accurate it is.
+
+Sections marked **TODO** need results from manual review that were not finished at the time of writing. Search the file for `TODO` to find them.
+
+| | |
+|---|---|
+| Corpus | 5,007 arXiv papers (title and abstract), cs.AI, cs.CL and cs.LG |
+| Topic model | BERTopic, reusing the `all-MiniLM-L6-v2` embeddings |
+| Entity model | spaCy `en_core_web_sm`, with a jargon filter and rules for known AI names |
+| Hardware | CPU only |
+| Code | `src/topics.py`, `src/topic_quality.py`, `src/ner.py`, `src/vector_store.py` |
+
+## 1. Choice of methods
+
+### Topic modeling: BERTopic
+
+BERTopic was chosen over LDA. LDA works on word counts only, so it treats "LLM" and "language model" as unrelated, and it is known to work poorly on short texts such as abstracts. BERTopic clusters the sentence embeddings the project already has, so it groups papers by meaning and no extra embedding pass is needed.
+
+The pipeline is:
+
+1. UMAP reduces the 384-dimensional embeddings to 5 dimensions (`n_neighbors=15`, `min_dist=0.0`, cosine distance, `random_state=42`).
+2. HDBSCAN clusters the reduced vectors (`min_cluster_size=20`). Papers that do not belong to any cluster are put in topic -1.
+3. c-TF-IDF picks the words that best describe each cluster. The top three words become the topic label.
+
+The vectorizer removes English stop words plus a list of words that appear in almost every abstract ("propose", "method", "results", "framework" and similar), keeps one- and two-word phrases, and ignores words found in fewer than 5 papers.
+
+`random_state` is fixed so the topics are the same on every run. Without it, the manual review would not match the next run.
+
+### Entity extraction: NER instead of sentiment
+
+The task allowed either sentiment analysis or NER. Sentiment was not used because research abstracts are written in a neutral tone, so a sentiment model would label almost every paper "neutral" and give no useful filter. Named entities (organizations, models, datasets, languages) are useful for filtering, for example "papers that mention Qwen3".
+
+Five entity types are kept:
+
+| Label | Meaning | Examples |
+|---|---|---|
+| `ORG` | companies, labs, universities | OpenAI, Google DeepMind, MIT |
+| `PRODUCT` | named models, datasets, software, benchmarks | GPT-4, Qwen3, ImageNet, MMLU |
+| `PERSON` | people | |
+| `GPE` | countries and cities | U.S., UK |
+| `LANGUAGE` | human languages | English, Arabic |
+
+Numbers, dates, percentages and other types are dropped because they are not useful for filtering.
+
+spaCy's small English model was used as the base because it is fast on CPU and already installed. Larger options were not used for this stage: `en_core_web_trf` is much slower on CPU, and zero-shot models such as GLiNER add another large model to the project.
+
+## 2. Topic results
+
+### 2.1 Overview
+
+| Metric | Value |
+|---|---|
+| Topics found | 42 |
+| Fitting time | about 48 s (UMAP takes about 45 s of it) |
+| Outliers before reassignment | 1,622 (32.4%) |
+| Outliers after reassignment | 201 (4.0%) |
+| Papers reassigned | 1,421 |
+| Topic diversity | 0.729 |
+| Mean topic cohesion | 0.666 |
+| Cohesion of the whole corpus | 0.517 |
+| Largest topic | Topic 0, 759 papers (15.2%) |
+
+**Topic diversity** is the share of unique words among the top 10 words of all topics. 1.0 would mean no topic shares a top word with another. At 0.729, most topics are described by their own words.
+
+**Cohesion** is the average cosine similarity between each paper in a topic and the center of that topic. The same measure over the whole corpus is 0.517, so papers within a topic are clearly more similar to each other than papers taken at random. Every topic scored above that baseline. The weakest topics were 0 (0.609), 4 and 9 (0.616), 8 (0.618) and 35 (0.626).
+
+### 2.2 Largest topics
+
+| Topic | Papers | Label (top words) |
+|---|---|---|
+| 0 | 759 | agent, agents, llm |
+| 1 | 383 | visual, video, image |
+| 2 | 262 | action, robot, world |
+| 6 | 201 | language, languages, text |
+| 3 | 185 | diffusion, sampling, flow |
+| 4 | 137 | molecular, protein, structure |
+| 5 | 137 | speech, audio, speaker |
+| 8 | 132 | neural, physics, pde |
+| 7 | 121 | teacher, student, distillation |
+| 9 | 92 | eeg, neural, brain |
+
+Counts are after outlier reassignment. The topics match recognizable research areas: LLM agents, vision and video, robotics, diffusion models, molecular and protein modeling, speech, multilingual NLP, knowledge distillation, physics-informed learning and brain signals.
+
+### 2.3 Manual validation
+
+Each topic was reviewed by reading its top 10 words and the 5 papers closest to its center, then marking it:
+
+- **yes**: the papers clearly share one theme
+- **partly**: mostly one theme, with some papers that do not fit
+- **no**: the papers do not share a clear theme
+
+The review sheet is `eval/topic_review.csv`, and the summary is produced by `python src/topic_quality.py summarize`.
+
+**TODO: fill in from `logs/topic_review_summary.json`.**
+
+| Verdict | Share of topics | Share of papers |
+|---|---|---|
+| yes | TODO | TODO |
+| partly | TODO | TODO |
+| no | TODO | TODO |
+
+Mean cohesion by verdict: TODO. If topics marked "no" have lower cohesion than those marked "yes", cohesion can be used to flag weak topics automatically in later runs.
+
+Topics marked "no", and why: TODO.
+
+Topic 0 needs particular attention in the review. It is both the largest topic and the one with the lowest cohesion, which suggests it mixes several agent-related themes, such as coding agents, web agents and multi-agent systems.
+
+## 3. Edge cases in topic modeling
+
+### 3.1 Outliers
+
+HDBSCAN placed 1,622 papers (32.4%) in topic -1. This is normal for HDBSCAN, but it means a third of the corpus would never match a topic filter.
+
+Outliers are reassigned with BERTopic's `reduce_outliers` using the embeddings strategy: each outlier is compared with every topic, and it is moved to the most similar topic only if the similarity is at least 0.5. This moved 1,421 papers and left 201 (4.0%) as outliers.
+
+Reassigned papers are less certain than papers HDBSCAN placed directly, so they are marked with `topic_reassigned = true` and have no topic probability. Filtered search can skip them with `--no-reassigned` when a stricter filter is needed.
+
+**TODO:** in the manual review, check whether reassigned papers fit their new topics. If many do not, raise the threshold (for example `python src/topics.py --outlier-threshold 0.6`).
+
+After reassignment, BERTopic recalculates topic representations from c-TF-IDF instead of embedding centers. Merging topics after this step is not supported, so `--nr-topics` is applied before reassignment.
+
+### 3.2 Short documents
+
+Papers with fewer than 60 words are marked `short_doc`, since topics based on very little text are less reliable. **No paper in this corpus is that short**, because the corpus build step already removes documents under 20 words and arXiv abstracts are much longer. The check stays in the code so it covers future data sources.
+
+### 3.3 Jargon
+
+Two kinds of jargon were handled:
+
+- **Words in every abstract.** Without the domain stop word list, labels filled up with words such as "propose" and "model". These are removed before topic words are chosen.
+- **Words shared by many topics.** After fitting, any word that appears in the top 10 of 25% or more of the topics is reported as a stop word candidate. No word reached that level in the final run.
+
+Technical terms that do identify a topic, such as "diffusion", "pde" or "eeg", are kept on purpose.
+
+## 4. Entity results
+
+### 4.1 Plain spaCy
+
+The first run used spaCy without changes.
+
+| Metric | Value |
+|---|---|
+| Time for 5,007 papers | 121.8 s (41 papers per second) |
+| Papers with at least one entity | 4,860 (97.1%) |
+| ORG / PRODUCT / PERSON / GPE / LANGUAGE | 17,021 / 879 / 5,201 / 1,526 / 76 |
+
+The most frequent entities show how the model, trained mostly on news text, handles AI papers:
+
+| Model output | Actual meaning |
+|---|---|
+| LLM, AI, GPU, RL, linear as **ORG** | general terms |
+| Gaussian, Markov, Monte Carlo as **PERSON** | mathematical terms named after people |
+| Qwen as **PERSON**, Qwen3 as **GPE** | a model family |
+| F1, node, AI as **GPE** | a metric and general words |
+
+Languages (English, Arabic, Spanish, Chinese) and some model names (DeepSeek, Llama) were labeled correctly.
+
+### 4.2 Jargon filter and rules
+
+Three changes were added on top of spaCy:
+
+1. **Entity rules** run before spaCy's own model and tag known names: model families matching a pattern such as GPT, Llama, Qwen, DeepSeek, Mistral, Gemma, Claude, Gemini or BERT, plus versions like Qwen3 and GPT-4o, as `PRODUCT`. Common datasets and benchmarks (ImageNet, MMLU, GSM8K, HumanEval and others) are also tagged `PRODUCT`, and major labs and companies `ORG`.
+2. **A jargon list** of general and mathematical terms (LLM, RL, GPU, Gaussian, Markov, Fourier, F1 and others) is never kept as an entity.
+3. **Lowercase spans are dropped**, since real names are capitalized.
+
+| Metric | Plain spaCy | With rules |
+|---|---|---|
+| Time for 5,007 papers | 121.8 s | 126.4 s |
+| Papers with at least one entity | 97.1% | 95.0% |
+| ORG | 17,021 | 14,635 |
+| PRODUCT | 879 | 1,997 |
+| PERSON | 5,201 | 4,264 |
+| GPE | 1,526 | 979 |
+| LANGUAGE | 76 | 76 |
+
+`PRODUCT` more than doubled, and its most frequent entries are now Qwen3, Claude, Qwen2.5, Qwen and DeepSeek. The fixed false positives are gone from the top of every list. The rules add about 4% to the running time.
+
+Errors that remained in the most frequent entities:
+
+- method acronyms as ORG: GRPO, QA, ML, OPD
+- optimizers and mathematical terms as PERSON or GPE: Adam, Muon, Wasserstein, Newton, ReLU
+- fragments of LaTeX: K$
+
+A further filter covers these: more terms in the jargon list, removal of spans containing `$`, and removal of short all-capital ORG spans that are not known organizations.
+
+**TODO:** if this filter was applied, add the counts from the next `python src/ner.py run` as a third column.
+
+### 4.3 Accuracy against a hand-labeled set
+
+50 papers were picked at random (seed 42) and labeled by hand in `eval/ner_gold.csv`, following these rules:
+
+- named models, datasets and benchmarks are `PRODUCT`
+- companies, labs and universities are `ORG`
+- general technical terms (LLM, RL, transformer), mathematical names (Gaussian, Markov) and metrics (F1, BLEU) are not entities
+- a name that can be a company or a model (DeepSeek) is labeled by its meaning in the sentence
+
+Predictions are compared after normalization (case, a leading "the", surrounding punctuation). Two scores are reported:
+
+- **strict**: the text and the label must both match
+- **span only**: the text must match, the label is ignored
+
+The gap between the two shows how often the model finds the right name but gives it the wrong type.
+
+**TODO: fill in from `logs/ner_eval_baseline.json` and `logs/ner_eval_with_rules.json`.**
+
+| | Precision | Recall | F1 |
+|---|---|---|---|
+| Plain spaCy, strict | TODO | TODO | TODO |
+| Plain spaCy, span only | TODO | TODO | TODO |
+| With rules, strict | TODO | TODO | TODO |
+| With rules, span only | TODO | TODO | TODO |
+
+Per label, with rules (strict):
+
+| Label | Precision | Recall | F1 |
+|---|---|---|---|
+| ORG | TODO | TODO | TODO |
+| PRODUCT | TODO | TODO | TODO |
+| PERSON | TODO | TODO | TODO |
+| GPE | TODO | TODO | TODO |
+| LANGUAGE | TODO | TODO | TODO |
+
+Most frequent misses and false positives: TODO (from `most_missed` and `most_wrong` in the report).
+
+With 50 papers, a difference of a few percentage points between the two versions is within noise. Only large differences should be read as a real improvement.
+
+## 5. Filtered retrieval
+
+### 5.1 Stored metadata
+
+Topic and entity metadata is added to every ChromaDB record during ingest:
+
+| Field | Type | Description |
+|---|---|---|
+| `topic` | int | Topic number, -1 for outliers |
+| `topic_label` | str | Name from the manual review if one was given, otherwise the top three words |
+| `topic_reassigned` | bool | True if the topic came from outlier reassignment |
+| `topic_prob` | float | HDBSCAN confidence, only for papers placed directly in a topic |
+| `entities` | str | Readable list, such as `OpenAI (ORG), GPT-4 (PRODUCT)` |
+| `n_entities` | int | Number of entities |
+| `ent_<name>` | bool | One flag per entity, such as `ent_qwen3 = true` |
+
+Each entity is stored as its own true/false flag because ChromaDB filters work reliably on simple values in every version, while list values are not supported everywhere. Entity names are lowercased and non-alphanumeric characters become underscores, so "GPT-4" becomes `ent_gpt_4`.
+
+The metadata is added during ingest instead of being patched onto existing records. Running `ingest --reset` therefore always rebuilds a clean collection, with no entity flags left over from earlier runs.
+
+### 5.2 Usage
+
+```bash
+python src/vector_store.py topics
+python src/vector_store.py search "reward models for alignment" --topic 0
+python src/vector_store.py search "open-weight model evaluation" --entity Qwen3
+python src/vector_store.py search "tool use" --topic 0 --no-reassigned
+```
+
+Filters are passed to ChromaDB as a `where` condition, so the similarity search only considers matching records. Several filters are combined with `$and`.
+
+### 5.3 Edge cases
+
+| Case | Handling |
+|---|---|
+| Topic number does not exist | Message pointing to the `topics` command |
+| Entity not mentioned by any paper | "No results match this filter" |
+| Collection ingested before topics and entities existed | Message asking to run `ingest --reset` |
+| NLP files missing during ingest | Ingest continues without that metadata and prints a note |
+| Several filters at once | Combined with `$and` |
+| Topic names changed after the manual review | Picked up on the next `ingest --reset` |
+
+### 5.4 Example
+
+**TODO:** add one query run with and without `--topic`, showing how the filter changes the results.
+
+## 6. Limitations
+
+- **The base NER model is not built for research text.** spaCy's small model was trained mostly on news, and the rules only cover names that were listed in advance. New model names that do not match a pattern can still be missed or mislabeled.
+- **Some names are ambiguous.** DeepSeek and Mistral are both companies and models. The rules always label them `PRODUCT`.
+- **The model name pattern is broad.** It matches any word starting with a known family name, so a metric such as BERTScore is labeled `PRODUCT`.
+- **Entity filters match exact normalized names.** "GPT-4" and "GPT4" are different flags.
+- **Entity filters are only as good as the extraction.** A paper whose entity was missed will not appear in that entity's filter.
+- **Reassigned topics are less certain.** 28% of the corpus (1,421 papers) got its topic through reassignment.
+- **Topic 0 is broad.** At 15% of the corpus with the lowest cohesion, filtering by it is less precise than filtering by smaller topics.
+- **The labeled set is small.** 50 papers is enough to see large effects, not small ones.
+
+## 7. Reproducing the results
+
+Run from the project root, in this order:
+
+```bash
+python src/topics.py
+python src/topic_quality.py metrics
+python src/topic_quality.py review       # then fill in eval/topic_review.csv
+python src/topic_quality.py summarize
+python src/ner.py run
+python src/ner.py sample                 # once, then label eval/ner_gold.csv
+python src/ner.py evaluate --baseline
+python src/ner.py evaluate
+python src/vector_store.py ingest --reset
+```
+
+| Output | Location |
+|---|---|
+| Topic per paper | `data/processed/doc_topics.jsonl` |
+| Topic list | `data/processed/topic_info.csv` |
+| Topic names from the review | `data/processed/topic_names.json` |
+| Entities per paper | `data/processed/doc_entities.jsonl` |
+| Saved topic model | `models/bertopic/` |
+| Topic charts | `reports/topics_barchart.html`, `reports/topics_map.html` |
+| Topic metrics | `logs/topic_metrics.json` |
+| Topic review summary | `logs/topic_review_summary.json` |
+| NER accuracy | `logs/ner_eval_baseline.json`, `logs/ner_eval_with_rules.json` |
+| Manual labels | `eval/ner_gold.csv`, `eval/topic_review.csv` |

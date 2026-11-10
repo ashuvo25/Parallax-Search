@@ -1,8 +1,11 @@
-"""ChromaDB vector store: ingest embeddings and run semantic search."""
+"""ChromaDB vector store: ingest embeddings with NLP metadata, and run filtered semantic search."""
 import argparse
+import csv
 import json
+import re
 import sys
 import time
+from collections import defaultdict
 from pathlib import Path
 
 import chromadb
@@ -14,10 +17,15 @@ sys.path.insert(0, str(ROOT))
 
 from src.embeddings import MODEL_NAME, load_model  # noqa: E402
 
+PROCESSED = ROOT / "data" / "processed"
 CHROMA_DIR = ROOT / "data" / "chroma"
-CORPUS_FILE = ROOT / "data" / "processed" / "clean_corpus.jsonl"
-EMB_FILE = ROOT / "data" / "processed" / "embeddings.npy"
-IDS_FILE = ROOT / "data" / "processed" / "embedding_ids.json"
+CORPUS_FILE = PROCESSED / "clean_corpus.jsonl"
+EMB_FILE = PROCESSED / "embeddings.npy"
+IDS_FILE = PROCESSED / "embedding_ids.json"
+DOC_TOPICS_FILE = PROCESSED / "doc_topics.jsonl"
+DOC_ENTITIES_FILE = PROCESSED / "doc_entities.jsonl"
+TOPIC_INFO_FILE = PROCESSED / "topic_info.csv"
+TOPIC_NAMES_FILE = PROCESSED / "topic_names.json"
 
 COLLECTION_NAME = "arxiv_papers"
 BATCH_SIZE = 1000
@@ -69,10 +77,77 @@ def stored_dim(collection) -> int | None:
     return len(embs[0])
 
 
+def has_nlp_metadata(collection) -> bool:
+    """True if records carry topic metadata (ingested after topic modeling)."""
+    if collection.count() == 0:
+        return False
+    metas = collection.get(limit=1, include=["metadatas"]).get("metadatas") or [{}]
+    return "topic" in (metas[0] or {})
+
+
+# ---------- NLP metadata ----------
+
+def entity_key(name: str) -> str:
+    """'GPT-4' -> 'ent_gpt_4'. One metadata flag per entity, easy to filter on."""
+    slug = re.sub(r"[^a-z0-9]+", "_", name.casefold()).strip("_")
+    return f"ent_{slug}" if slug else ""
+
+
+def load_topic_names() -> dict[int, str]:
+    """Topic labels, with your better names from the manual review taking priority."""
+    names = {}
+    if TOPIC_INFO_FILE.exists():
+        with open(TOPIC_INFO_FILE, encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                names[int(row["Topic"])] = row["CustomName"]
+    names[-1] = "Unassigned"
+    if TOPIC_NAMES_FILE.exists():
+        custom = json.loads(TOPIC_NAMES_FILE.read_text(encoding="utf-8"))
+        names.update({int(k): v for k, v in custom.items()})
+    return names
+
+
+def load_nlp_metadata() -> dict[str, dict]:
+    """Topic and entity metadata per document ID, if the NLP steps have been run."""
+    meta = defaultdict(dict)
+    names = load_topic_names()
+
+    if DOC_TOPICS_FILE.exists():
+        with open(DOC_TOPICS_FILE, encoding="utf-8") as f:
+            for line in f:
+                rec = json.loads(line)
+                t = int(rec["topic"])
+                m = meta[rec["id"]]
+                m["topic"] = t
+                m["topic_label"] = names.get(t, rec["topic_label"])
+                m["topic_reassigned"] = bool(rec.get("reassigned", False))
+                if rec.get("topic_prob") is not None:
+                    m["topic_prob"] = float(rec["topic_prob"])
+    else:
+        print("Note: doc_topics.jsonl not found, ingesting without topics.")
+
+    if DOC_ENTITIES_FILE.exists():
+        with open(DOC_ENTITIES_FILE, encoding="utf-8") as f:
+            for line in f:
+                rec = json.loads(line)
+                ents = rec["entities"]
+                m = meta[rec["id"]]
+                m["entities"] = ", ".join(f"{e['text']} ({e['label']})" for e in ents)
+                m["n_entities"] = len(ents)
+                for e in ents:
+                    key = entity_key(e["text"])
+                    if key:
+                        m[key] = True
+    else:
+        print("Note: doc_entities.jsonl not found, ingesting without entities.")
+
+    return meta
+
+
 # ---------- ingest ----------
 
 def load_records():
-    """Load IDs, embeddings, texts and metadata, all in the same order."""
+    """Load IDs, embeddings, texts and metadata (including NLP metadata), all in order."""
     for path in (CORPUS_FILE, EMB_FILE, IDS_FILE):
         if not path.exists():
             raise FileNotFoundError(
@@ -89,6 +164,8 @@ def load_records():
             rec = json.loads(line)
             corpus[rec["id"]] = rec
 
+    nlp = load_nlp_metadata()
+
     documents, metadatas = [], []
     for id_ in ids:
         if id_ not in corpus:
@@ -101,6 +178,7 @@ def load_records():
             "title": rec["title"],
             "n_words": rec["n_words"],
             "source_file": rec["source_file"],
+            **nlp.get(id_, {}),
         })
     return ids, embeddings, documents, metadatas
 
@@ -116,7 +194,6 @@ def _clean_metadata(meta: dict | None) -> dict:
 
 
 def _check_embeddings(embeddings, collection) -> np.ndarray:
-    """Make sure embeddings are a clean 2D array that fits the collection."""
     arr = np.asarray(embeddings, dtype=np.float32)
     if arr.ndim != 2:
         raise ValueError(f"Embeddings must be 2D (n, dim), got shape {arr.shape}")
@@ -153,7 +230,6 @@ def ingest(collection, ids, embeddings, documents, metadatas) -> int:
 
     embeddings = _check_embeddings(embeddings, collection)
 
-    # ChromaDB rejects duplicate IDs in the same call, so keep the first of each
     seen, keep = set(), []
     for i, id_ in enumerate(ids):
         if id_ not in seen:
@@ -184,9 +260,28 @@ def ingest(collection, ids, embeddings, documents, metadatas) -> int:
 
 # ---------- search ----------
 
+def make_where(topic: int | None = None, entity: str | None = None,
+               exclude_reassigned: bool = False) -> dict | None:
+    """Build a ChromaDB filter. Several conditions are combined with $and."""
+    conditions = []
+    if topic is not None:
+        conditions.append({"topic": int(topic)})
+    if entity:
+        key = entity_key(entity)
+        if not key:
+            raise ValueError("Entity name is empty.")
+        conditions.append({key: True})
+    if exclude_reassigned:
+        conditions.append({"topic_reassigned": False})
+
+    if not conditions:
+        return None
+    return conditions[0] if len(conditions) == 1 else {"$and": conditions}
+
+
 def search(collection, model, query: str, k: int = 5,
-           min_score: float = DEFAULT_MIN_SCORE) -> list[dict]:
-    """Return up to k results, best first, with at most one result per paper."""
+           min_score: float = DEFAULT_MIN_SCORE, where: dict | None = None) -> list[dict]:
+    """Return up to k results, best first, at most one per paper, optionally filtered."""
     if not isinstance(query, str):
         raise TypeError("Query must be a string.")
     query = query.strip()
@@ -214,12 +309,11 @@ def search(collection, model, query: str, k: int = 5,
             f"The collection was probably built with a different model."
         )
 
-    # With chunks, several pieces of one paper can match. Fetch extra results
-    # and keep only the best chunk per paper (doc_id).
     n_fetch = min(k * 4, count)
     res = collection.query(
         query_embeddings=query_emb.tolist(),
         n_results=n_fetch,
+        where=where,
         include=["documents", "metadatas", "distances"],
     )
 
@@ -228,7 +322,7 @@ def search(collection, model, query: str, k: int = 5,
                                     res["metadatas"][0], res["distances"][0]):
         score = 1 - dist / 2  # squared L2 on unit vectors -> cosine similarity
         if score < min_score:
-            break  # results are sorted best first, so the rest are worse
+            break
         meta = meta or {}
         doc_id = meta.get("doc_id", id_)
         if doc_id in seen_docs:
@@ -239,6 +333,9 @@ def search(collection, model, query: str, k: int = 5,
             "doc_id": doc_id,
             "title": meta.get("title", ""),
             "score": round(score, 4),
+            "topic": meta.get("topic"),
+            "topic_label": meta.get("topic_label", ""),
+            "entities": meta.get("entities", ""),
             "text": doc or "",
         })
         if len(results) == k:
@@ -248,47 +345,92 @@ def search(collection, model, query: str, k: int = 5,
 
 # ---------- command line ----------
 
+def cmd_topics() -> None:
+    if not TOPIC_INFO_FILE.exists():
+        print("No topics yet. Run: python src/topics.py")
+        return
+    names = load_topic_names()
+    with open(TOPIC_INFO_FILE, encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    print(f"{'Topic':>5}  {'Papers':>6}  Name")
+    for row in rows:
+        t = int(row["Topic"])
+        print(f"{t:>5}  {row['Count']:>6}  {names.get(t, row['CustomName'])}")
+
+
 def main():
     parser = argparse.ArgumentParser(description="ChromaDB ingest and search.")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    p_ingest = sub.add_parser("ingest", help="load embeddings into ChromaDB")
+    p_ingest = sub.add_parser("ingest", help="load embeddings and metadata into ChromaDB")
     p_ingest.add_argument("--reset", action="store_true", help="delete the collection first")
+
+    sub.add_parser("topics", help="list topics you can filter on")
 
     p_search = sub.add_parser("search", help="search the collection")
     p_search.add_argument("query")
     p_search.add_argument("-k", type=int, default=5)
-    p_search.add_argument("--min-score", type=float, default=DEFAULT_MIN_SCORE,
-                          help="hide results below this score (about 0.3 filters junk)")
+    p_search.add_argument("--min-score", type=float, default=DEFAULT_MIN_SCORE)
+    p_search.add_argument("--topic", type=int, help="only this topic number")
+    p_search.add_argument("--entity", help="only papers mentioning this entity, e.g. Qwen3")
+    p_search.add_argument("--no-reassigned", action="store_true",
+                          help="skip papers whose topic came from outlier reassignment")
 
     args = parser.parse_args()
+
+    if args.command == "topics":
+        cmd_topics()
+        return
+
     client = get_client()
 
     if args.command == "ingest":
         collection = get_collection(client, reset=args.reset)
         ingest(collection, *load_records())
+        return
 
-    elif args.command == "search":
-        collection = get_collection(client)
-        model = load_model()
-        start = time.perf_counter()
-        results = search(collection, model, args.query, args.k, args.min_score)
-        elapsed_ms = 1000 * (time.perf_counter() - start)
+    # search
+    collection = get_collection(client)
+    filtering = args.topic is not None or args.entity or args.no_reassigned
 
-        if not results:
-            if collection.count() == 0:
-                print("No results. The collection is empty; run ingest first.")
-            else:
-                print(f"No results above score {args.min_score}.")
+    if filtering and not has_nlp_metadata(collection):
+        print("This collection has no topic/entity metadata yet. "
+              "Run: python src/vector_store.py ingest --reset")
+        return
+    if args.topic is not None and TOPIC_INFO_FILE.exists():
+        known = set(load_topic_names())
+        if args.topic not in known:
+            print(f"Topic {args.topic} does not exist. "
+                  f"Run: python src/vector_store.py topics")
             return
 
-        print(f"\nTop {len(results)} for: \"{args.query}\"  ({elapsed_ms:.1f} ms)\n")
-        for rank, r in enumerate(results, 1):
-            title = r["title"]
-            snippet = (r["text"][len(title):].strip()
-                       if title and r["text"].startswith(title) else r["text"])
-            print(f"{rank}. [{r['score']:.3f}] {title}")
-            print(f"   {snippet[:200]}...\n")
+    where = make_where(args.topic, args.entity, args.no_reassigned)
+    model = load_model()
+    start = time.perf_counter()
+    results = search(collection, model, args.query, args.k, args.min_score, where)
+    elapsed_ms = 1000 * (time.perf_counter() - start)
+
+    if not results:
+        if collection.count() == 0:
+            print("No results. The collection is empty; run ingest first.")
+        elif where:
+            print(f"No results match this filter: {where}")
+        else:
+            print(f"No results above score {args.min_score}.")
+        return
+
+    filter_note = f"  filter: {where}" if where else ""
+    print(f"\nTop {len(results)} for: \"{args.query}\"  ({elapsed_ms:.1f} ms){filter_note}\n")
+    for rank, r in enumerate(results, 1):
+        title = r["title"]
+        snippet = (r["text"][len(title):].strip()
+                   if title and r["text"].startswith(title) else r["text"])
+        print(f"{rank}. [{r['score']:.3f}] {title}")
+        if r["topic"] is not None:
+            print(f"   Topic {r['topic']}: {r['topic_label']}")
+        if r["entities"]:
+            print(f"   Entities: {r['entities'][:120]}")
+        print(f"   {snippet[:200]}...\n")
 
 
 if __name__ == "__main__":

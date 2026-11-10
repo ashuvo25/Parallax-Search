@@ -1,0 +1,38 @@
+{
+  "documents": 5007,
+  "topics": 42,
+  "outliers": 201,
+  "outlier_pct": 4.0,
+  "reassigned": 1421,
+  "short_docs": 0,
+  "topic_diversity": 0.729,
+  "mean_cohesion": 0.666,
+  "corpus_baseline_cohesion": 0.517,
+  "largest_topic": {
+    "topic": 0,
+    "papers": 759,
+    "pct": 15.2
+  },
+  "weakest_topics": [
+    {
+      "topic": 0,
+      "cohesion": 0.609
+    },
+    {
+      "topic": 4,
+      "cohesion": 0.616
+    },
+    {
+      "topic": 9,
+      "cohesion": 0.616
+    },
+    {
+      "topic": 8,
+      "cohesion": 0.618
+    },
+    {
+      "topic": 35,
+      "cohesion": 0.626
+    }
+  ]
+}

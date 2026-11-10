@@ -1,0 +1,45 @@
+2026-11-10 16:07:25,307 | INFO | Loaded 5007 documents
+2026-11-10 16:08:37,587 | INFO | Fitted in 64.9s
+2026-11-10 16:08:37,592 | INFO | Found 42 topics | outliers: 1622 (32.4%)
+2026-11-10 16:08:37,595 | INFO |   Topic   0 |  661 papers | agent, agents, harness
+2026-11-10 16:08:37,596 | INFO |   Topic   1 |  296 papers | visual, video, image
+2026-11-10 16:08:37,597 | INFO |   Topic   2 |  213 papers | robot, action, world
+2026-11-10 16:08:37,597 | INFO |   Topic   3 |  137 papers | diffusion, flow, sampling
+2026-11-10 16:08:37,598 | INFO |   Topic   4 |  126 papers | molecular, protein, structure
+2026-11-10 16:08:37,598 | INFO |   Topic   5 |  124 papers | speech, audio, speaker
+2026-11-10 16:08:37,599 | INFO |   Topic   6 |  113 papers | language, languages, multilingual
+2026-11-10 16:08:37,599 | INFO |   Topic   7 |  105 papers | teacher, student, distillation
+2026-11-10 16:08:37,599 | INFO |   Topic   8 |   95 papers | neural, pde, physics
+2026-11-10 16:08:37,599 | INFO |   Topic   9 |   79 papers | eeg, neural, brain
+2026-11-10 16:08:45,018 | INFO | Saved doc_topics.jsonl, topic_info.csv, model in D:\Internship-project-Parallax-Labs\models\bertopic, charts in D:\Internship-project-Parallax-Labs\reports
+2026-11-10 16:27:40,785 | INFO | Loaded 5007 documents
+2026-11-10 16:28:33,981 | INFO | Fitted in 47.4s
+2026-11-10 16:28:33,982 | INFO | No documents shorter than 60 words
+2026-11-10 16:28:36,862 | INFO | Outliers: 1622 (32.4%) -> 201 (4.0%), 1421 reassigned (threshold 0.5)
+2026-11-10 16:28:36,870 | INFO | Found 42 topics
+2026-11-10 16:28:36,875 | INFO |   Topic   0 |  759 papers | agent, agents, llm
+2026-11-10 16:28:36,875 | INFO |   Topic   1 |  383 papers | visual, video, image
+2026-11-10 16:28:36,876 | INFO |   Topic   2 |  262 papers | action, robot, world
+2026-11-10 16:28:36,877 | INFO |   Topic   3 |  185 papers | diffusion, sampling, flow
+2026-11-10 16:28:36,878 | INFO |   Topic   4 |  137 papers | molecular, protein, structure
+2026-11-10 16:28:36,879 | INFO |   Topic   5 |  137 papers | speech, audio, speaker
+2026-11-10 16:28:36,880 | INFO |   Topic   6 |  201 papers | language, languages, text
+2026-11-10 16:28:36,881 | INFO |   Topic   7 |  121 papers | teacher, student, distillation
+2026-11-10 16:28:36,881 | INFO |   Topic   8 |  132 papers | neural, physics, pde
+2026-11-10 16:28:36,882 | INFO |   Topic   9 |   92 papers | eeg, neural, brain
+2026-11-10 16:33:24,725 | INFO | Loaded 5007 documents
+2026-11-10 16:34:19,587 | INFO | Fitted in 49.2s
+2026-11-10 16:34:19,588 | INFO | No documents shorter than 60 words
+2026-11-10 16:34:22,004 | INFO | Outliers: 1622 (32.4%) -> 201 (4.0%), 1421 reassigned (threshold 0.5)
+2026-11-10 16:34:22,010 | INFO | Found 42 topics
+2026-11-10 16:34:22,017 | INFO |   Topic   0 |  759 papers | agent, agents, llm
+2026-11-10 16:34:22,018 | INFO |   Topic   1 |  383 papers | visual, video, image
+2026-11-10 16:34:22,019 | INFO |   Topic   2 |  262 papers | action, robot, world
+2026-11-10 16:34:22,019 | INFO |   Topic   3 |  185 papers | diffusion, sampling, flow
+2026-11-10 16:34:22,020 | INFO |   Topic   4 |  137 papers | molecular, protein, structure
+2026-11-10 16:34:22,020 | INFO |   Topic   5 |  137 papers | speech, audio, speaker
+2026-11-10 16:34:22,020 | INFO |   Topic   6 |  201 papers | language, languages, text
+2026-11-10 16:34:22,021 | INFO |   Topic   7 |  121 papers | teacher, student, distillation
+2026-11-10 16:34:22,021 | INFO |   Topic   8 |  132 papers | neural, physics, pde
+2026-11-10 16:34:22,022 | INFO |   Topic   9 |   92 papers | eeg, neural, brain
+2026-11-10 16:34:29,523 | INFO | Saved doc_topics.jsonl, topic_info.csv, model and charts
