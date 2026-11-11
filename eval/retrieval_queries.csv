@@ -1,0 +1,22 @@
+query_id,query
+q01,How are LLM agents evaluated?
+q02,Detecting prompt injection attacks on LLM agents
+q03,Reward models for aligning language models with human preferences
+q04,Video generation with diffusion models
+q05,Robot manipulation learned from demonstrations
+q06,Faster sampling for diffusion models
+q07,Protein structure prediction with deep learning
+q08,Speech recognition for low-resource languages
+q09,Multilingual large language models for non-English languages
+q10,Knowledge distillation from large teacher models to small students
+q11,Neural networks for solving partial differential equations
+q12,Decoding EEG brain signals with deep learning
+q13,Retrieval-augmented generation to reduce hallucinations
+q14,Mixture-of-experts architectures for efficient language models
+q15,Reinforcement learning to improve reasoning in language models
+q16,Code generation and software engineering agents
+q17,Vision-language models for image understanding
+q18,Membership inference and privacy attacks on trained models
+q19,Graph neural networks for molecular property prediction
+q20,Long-context memory for language models
+,

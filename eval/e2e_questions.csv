@@ -1,0 +1,22 @@
+qid,category,expected,question
+e01,in_domain,answer,How are LLM agents evaluated?
+e02,in_domain,answer,What methods are used to detect prompt injection attacks on LLM agents?
+e03,in_domain,answer,How are reward models used to align language models with human preferences?
+e04,in_domain,answer,How do recent papers generate long videos with diffusion models?
+e05,in_domain,answer,How do robots learn manipulation skills from human demonstrations?
+e06,in_domain,answer,What techniques make diffusion model sampling faster?
+e07,in_domain,answer,How is knowledge distillation used to train smaller language models?
+e08,in_domain,answer,How are neural networks used to solve partial differential equations?
+e09,in_domain,answer,What deep learning approaches are used to decode EEG signals?
+e10,in_domain,answer,How do mixture-of-experts models route tokens to experts?
+e11,in_domain,answer,How is reinforcement learning used to improve reasoning in language models?
+e12,in_domain,answer,What are membership inference attacks on machine learning models?
+e13,off_topic,refuse,What is the capital of France?
+e14,off_topic,refuse,Give me a recipe for chocolate cake.
+e15,off_topic,refuse,Who won the 2022 FIFA World Cup?
+e16,off_topic,refuse,hi
+e17,off_topic,refuse,Write a poem about the ocean.
+e18,out_of_corpus,refuse,What did the original Attention Is All You Need paper propose?
+e19,out_of_corpus,refuse,Which GPUs were used to train the original ResNet in 2015?
+e20,out_of_corpus,refuse,What score did GPT-7 get on the MMLU benchmark?
+,,,

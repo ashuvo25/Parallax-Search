@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-11-11T23:21:15",
+  "mode": "in-process",
+  "questions": 20,
+  "errors": {},
+  "behavior_accuracy": 0.85,
+  "behavior_by_category": {
+    "in_domain": 1.0,
+    "off_topic": 0.8,
+    "out_of_corpus": 0.333
+  },
+  "answered": 15,
+  "citation_rate": 0.667,
+  "answers_with_invalid_citations": 0,
+  "groundedness": 0.759,
+  "answer_relevance": 0.633,
+  "judge_faithfulness": null,
+  "judge_relevance": null,
+  "latency_ms": {
+    "total_p50": 1797.7,
+    "total_p95": 2471.6,
+    "total_max": 3033.8,
+    "retrieval_p50": 744.3,
+    "generation_p50": 1097.2,
+    "client_p50": 1706.3
+  },
+  "tokens_mean": {
+    "prompt": 1682.062,
+    "completion": 451.188
+  },
+  "support_threshold": 0.5
+}

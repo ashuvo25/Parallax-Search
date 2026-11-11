@@ -1,0 +1,41 @@
+system,query_id,query,n_relevant,rr,P@1,R@1,unjudged@1,P@3,R@3,unjudged@3,P@5,R@5,unjudged@5,P@10,R@10,unjudged@10
+semantic,q01,How are LLM agents evaluated?,10,0.5,0.0,0.0,0,0.3333,0.1,0,0.2,0.1,0,0.4,0.4,0
+semantic,q02,Detecting prompt injection attacks on LLM agents,10,1.0,1.0,0.1,0,0.6667,0.2,0,0.8,0.4,0,0.6,0.6,0
+semantic,q03,Reward models for aligning language models with human preferences,7,1.0,1.0,0.1429,0,0.6667,0.2857,0,0.4,0.2857,0,0.4,0.5714,0
+semantic,q04,Video generation with diffusion models,9,1.0,1.0,0.1111,0,1.0,0.3333,0,1.0,0.5556,0,0.7,0.7778,0
+semantic,q05,Robot manipulation learned from demonstrations,10,1.0,1.0,0.1,0,0.6667,0.2,0,0.8,0.4,0,0.7,0.7,0
+semantic,q06,Faster sampling for diffusion models,5,1.0,1.0,0.2,0,0.6667,0.4,0,0.6,0.6,0,0.4,0.8,0
+semantic,q07,Protein structure prediction with deep learning,3,0.3333,0.0,0.0,0,0.3333,0.3333,0,0.4,0.6667,0,0.2,0.6667,0
+semantic,q08,Speech recognition for low-resource languages,4,1.0,1.0,0.25,0,1.0,0.75,0,0.6,0.75,0,0.4,1.0,0
+semantic,q09,Multilingual large language models for non-English languages,12,0.5,0.0,0.0,0,0.6667,0.1667,0,0.6,0.25,0,0.7,0.5833,0
+semantic,q10,Knowledge distillation from large teacher models to small students,14,1.0,1.0,0.0714,0,1.0,0.2143,0,1.0,0.3571,0,0.8,0.5714,0
+semantic,q11,Neural networks for solving partial differential equations,11,1.0,1.0,0.0909,0,0.6667,0.1818,0,0.8,0.3636,0,0.9,0.8182,0
+semantic,q12,Decoding EEG brain signals with deep learning,11,1.0,1.0,0.0909,0,0.6667,0.1818,0,0.8,0.3636,0,0.7,0.6364,0
+semantic,q13,Retrieval-augmented generation to reduce hallucinations,2,0.0,0.0,0.0,0,0.0,0.0,0,0.0,0.0,0,0.0,0.0,0
+semantic,q14,Mixture-of-experts architectures for efficient language models,10,1.0,1.0,0.1,0,0.6667,0.2,0,0.6,0.3,0,0.4,0.4,0
+semantic,q15,Reinforcement learning to improve reasoning in language models,7,1.0,1.0,0.1429,0,0.3333,0.1429,0,0.6,0.4286,0,0.4,0.5714,0
+semantic,q16,Code generation and software engineering agents,14,1.0,1.0,0.0714,0,1.0,0.2143,0,1.0,0.3571,0,0.8,0.5714,0
+semantic,q17,Vision-language models for image understanding,8,0.5,0.0,0.0,0,0.6667,0.25,0,0.4,0.25,0,0.4,0.5,0
+semantic,q18,Membership inference and privacy attacks on trained models,8,1.0,1.0,0.125,0,0.6667,0.25,0,0.6,0.375,0,0.6,0.75,0
+semantic,q19,Graph neural networks for molecular property prediction,4,1.0,1.0,0.25,0,0.6667,0.5,0,0.6,0.75,0,0.4,1.0,0
+semantic,q20,Long-context memory for language models,11,1.0,1.0,0.0909,0,0.6667,0.1818,0,0.8,0.3636,0,0.6,0.5455,0
+keyword_tfidf,q01,How are LLM agents evaluated?,10,1.0,1.0,0.1,0,1.0,0.3,0,0.8,0.4,0,0.6,0.6,0
+keyword_tfidf,q02,Detecting prompt injection attacks on LLM agents,10,1.0,1.0,0.1,0,1.0,0.3,0,1.0,0.5,0,0.9,0.9,0
+keyword_tfidf,q03,Reward models for aligning language models with human preferences,7,1.0,1.0,0.1429,0,0.6667,0.2857,0,0.6,0.4286,0,0.5,0.7143,0
+keyword_tfidf,q04,Video generation with diffusion models,9,1.0,1.0,0.1111,0,0.6667,0.2222,0,0.4,0.2222,0,0.5,0.5556,0
+keyword_tfidf,q05,Robot manipulation learned from demonstrations,10,1.0,1.0,0.1,0,0.6667,0.2,0,0.6,0.3,0,0.6,0.6,0
+keyword_tfidf,q06,Faster sampling for diffusion models,5,0.5,0.0,0.0,0,0.3333,0.2,0,0.4,0.4,0,0.3,0.6,0
+keyword_tfidf,q07,Protein structure prediction with deep learning,3,0.5,0.0,0.0,0,0.3333,0.3333,0,0.4,0.6667,0,0.2,0.6667,0
+keyword_tfidf,q08,Speech recognition for low-resource languages,4,1.0,1.0,0.25,0,0.6667,0.5,0,0.4,0.5,0,0.4,1.0,0
+keyword_tfidf,q09,Multilingual large language models for non-English languages,12,0.5,0.0,0.0,0,0.6667,0.1667,0,0.8,0.3333,0,0.9,0.75,0
+keyword_tfidf,q10,Knowledge distillation from large teacher models to small students,14,1.0,1.0,0.0714,0,0.6667,0.1429,0,0.8,0.2857,0,0.8,0.5714,0
+keyword_tfidf,q11,Neural networks for solving partial differential equations,11,1.0,1.0,0.0909,0,1.0,0.2727,0,1.0,0.4545,0,1.0,0.9091,0
+keyword_tfidf,q12,Decoding EEG brain signals with deep learning,11,1.0,1.0,0.0909,0,0.6667,0.1818,0,0.8,0.3636,0,0.7,0.6364,0
+keyword_tfidf,q13,Retrieval-augmented generation to reduce hallucinations,2,0.5,0.0,0.0,0,0.3333,0.5,0,0.4,1.0,0,0.2,1.0,0
+keyword_tfidf,q14,Mixture-of-experts architectures for efficient language models,10,0.5,0.0,0.0,0,0.6667,0.2,0,0.8,0.4,0,0.7,0.7,0
+keyword_tfidf,q15,Reinforcement learning to improve reasoning in language models,7,1.0,1.0,0.1429,0,0.3333,0.1429,0,0.6,0.4286,0,0.4,0.5714,0
+keyword_tfidf,q16,Code generation and software engineering agents,14,1.0,1.0,0.0714,0,1.0,0.2143,0,1.0,0.3571,0,0.9,0.6429,0
+keyword_tfidf,q17,Vision-language models for image understanding,8,1.0,1.0,0.125,0,0.6667,0.25,0,0.4,0.25,0,0.5,0.625,0
+keyword_tfidf,q18,Membership inference and privacy attacks on trained models,8,1.0,1.0,0.125,0,1.0,0.375,0,0.8,0.5,0,0.6,0.75,0
+keyword_tfidf,q19,Graph neural networks for molecular property prediction,4,1.0,1.0,0.25,0,0.6667,0.5,0,0.4,0.5,0,0.3,0.75,0
+keyword_tfidf,q20,Long-context memory for language models,11,0.5,0.0,0.0,0,0.6667,0.1818,0,0.8,0.3636,0,0.9,0.8182,0
